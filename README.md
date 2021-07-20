@@ -2,6 +2,7 @@
 
 <!-- Plugin description -->
 **GoComment** is a plugin for vscode, auto generate for golang function, variable, struct comments.
+使用默认模版可以生成满足golint要求的注释。
 <br/>
 
 ## <t1>How to use</t1>
