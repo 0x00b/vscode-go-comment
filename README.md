@@ -32,7 +32,7 @@ godoc -http=localhost:6060
 # Getting started
 
 ## How to install
-1.goland plugins marketplace(search GoAn)
+1.vscode plugins marketplace(search GoComment)
 
 ### special tag, represent beginning of a special line.
 * @receiver ： golang function receiver
