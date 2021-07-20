@@ -1,70 +1,62 @@
-# vscodeGoComment README
+# GoComment
 
-This is the README for your extension "vscodeGoComment". After writing up a brief description, we recommend including the following sections.
+<!-- Plugin description -->
+**GoComment** is a plugin for vscode, auto generate for golang function, variable, struct comments.
+<br/>
 
-## Features
+## <t1>How to use</t1>
++ **control + command + / (For windows: control + alt + /)**
+   
+## config template
++ 1. shift+command+p -> open setting (json)
++ 2. add line "functionTemplate": "// ${func_name} \n//  @receiver ${receiver_name} \n//  @param ${param_name} \n//  @return ${return_name} ",
++ 3. add line "typeTemplate": "// ${type_name} " 
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+<br/>
+推荐使用默认注释，满足Golang godoc注释规范，满足golint默认扫描规则。<br/>
 
-For example if there is an image subfolder under your extension project workspace:
+![](https://raw.githubusercontent.com/0x00b/golandanno/main/src/main/resources/intro.gif)
 
-\!\[feature X\]\(images/feature-x.png\)
+使用godoc查看注释效果如下：
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+```shell
+godoc -http=localhost:6060
+```
+![](https://raw.githubusercontent.com/0x00b/golandanno/main/src/main/resources/img_1.png)
 
-## Requirements
+![](https://raw.githubusercontent.com/0x00b/golandanno/main/src/main/resources/godoc.gif)
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
 
-## Extension Settings
+<!-- Plugin description end -->
+ 
+# Getting started
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## How to install
+1.goland plugins marketplace(search GoAn)
 
-For example:
+### special tag, represent beginning of a special line.
+* @receiver ： golang function receiver
+* @param ： golang function parameter 
+* @return ： golang function return parameter
+* @update ： update tag, when update annotation, will add one line
 
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
-
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+### support variable
+```go
+func (r receiver)Foo(i interface{}) (e error)
+```
+* ${func_name} : function name is "Foo".
+* ${receiver_name} : will be replaced by "r".
+* ${receiver_type} : will be replaced by "receiver".
+* ${receiver_name_type} :  will be replaced by "r receiver".
+* ${param_name} : "i"
+* ${param_type} : "interface{}"
+* ${param_name_type} : "i interface{}"
+* ${return_name} : "e"
+* ${return_type} : "error"
+* ${return_name_type} : "e error"
+* ${package_name} : package name
+* ${type_name} : type Int int64,  ${type_name} is "Int"
+* ${var_name} : var n int, ${var_name} is "n"
+* ${var_type} : var n int, ${var_type} is "int"
+* ${date} : date
+* ${git_name}: git config name

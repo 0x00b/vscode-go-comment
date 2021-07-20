@@ -1,9 +1,9 @@
 {
 	"name": "vscodeGoComment",
 	"displayName": "GoComment",
-	"description": "**GoComment** is a plugin for goland, auto generate for golang function, variable, struct comments.",
+	"description": "**GoComment** is a plugin for vscode, auto generate for golang function, variable, struct comments.",
 	"version": "0.0.1",
-	"icon": "./pluginIcon.png",
+	"icon": "https://raw.githubusercontent.com/0x00b/vscode-go-comment/master/pluginIcon.png",
 	"engines": {
 		"vscode": "^1.58.0"
 	},
