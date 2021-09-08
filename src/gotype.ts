@@ -9,7 +9,7 @@ export type GoType = {
 };
 
 // match "type XXX ..."
-const typeRegexPattern = RegExp("^\\s*type\\s*(\\w+)\\s*(\\w+)\\s*");
+const typeRegexPattern = RegExp("^\\s*type\\s*(\\w+)(?:\\s+(\\w+))?\\s*");
 
 export function detect(ctx: Ctx): DetectResult | null {
     let f = {} as GoType;
