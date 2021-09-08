@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import * as fc from "./findcode";
 import * as func from "./func";
 import * as gotype from "./gotype";
+import * as govar from "./govar";
 
 export type Ctx = {
     content: string
@@ -32,6 +33,15 @@ export function generate(ctx: Ctx) {
     res = gotype.detect(ctx);
     if (res !== null) {
         let comment = gotype.generateComment(ctx, res);
+        if (null !== comment) {
+            // vscode.window.showInformationMessage(comment);
+            replaceAnnotation(ctx, res, comment);
+        }
+        return;
+    }
+    res = govar.detect(ctx);
+    if (res !== null) {
+        let comment = govar.generateComment(ctx, res);
         if (null !== comment) {
             // vscode.window.showInformationMessage(comment);
             replaceAnnotation(ctx, res, comment);
