@@ -3,6 +3,7 @@ import * as fc from "./findcode";
 import * as func from "./func";
 import * as gotype from "./gotype";
 import * as govar from "./govar";
+import * as moment from "moment";
 
 export type Ctx = {
     content: string
@@ -20,6 +21,12 @@ export function generate(ctx: Ctx) {
     if (!ctx.code.find) {
         return;
     }
+  
+    ctx.date = moment(new Date()).format("YYYY-MM-DD hh:mm:ss");
+  
+    var exec = require('child_process').execSync;
+    ctx.gitName = exec('git config user.name').toString().trim();
+
     let res = func.detect(ctx);
     if (res !== null) {
         let comment = func.generateComment(ctx, res);

@@ -3,7 +3,7 @@
 	"displayName": "GoComment",
 	"publisher": "lijunawk",
 	"description": "GoComment is a plugin for vscode, auto generate for golang function, variable, struct comments. github: https://github.com/0x00b/vscode-go-comment",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"icon": "icon.png",
 	"repository": {
 		"url": "https://github.com/0x00b/vscode-go-comment"
@@ -19,27 +19,29 @@
 		"onLanguage:go"
 	],
 	"main": "./out/extension.js",
-	"contributes": { 
-		"keybindings": [{
-		  "command": "vscodeGoComment.AutoComment",
-		  "key": "ctrl+alt+/",
-		  "mac": "ctrl+cmd+/",
-		  "when": "editorTextFocus && editorLangId == go"
-		}],
-		"configuration":{
+	"contributes": {
+		"keybindings": [
+			{
+				"command": "vscodeGoComment.AutoComment",
+				"key": "ctrl+alt+/",
+				"mac": "ctrl+cmd+/",
+				"when": "editorTextFocus && editorLangId == go"
+			}
+		],
+		"configuration": {
 			"title": "Go Comment Template",
 			"properties": {
-				"functionTemplate":{ 
+				"functionTemplate": {
 					"type": "string",
-					"default":"// ${func_name} \n//  @receiver ${receiver_name} \n//  @param ${param_name} \n//  @return ${return_name} "
+					"default": "// ${func_name} \n//  @receiver ${receiver_name} \n//  @param ${param_name} \n//  @return ${return_name} "
 				},
-				"typeTemplate":{ 
+				"typeTemplate": {
 					"type": "string",
-					"default":"// ${type_name} "
+					"default": "// ${type_name} "
 				},
-				"varTemplate":{ 
+				"varTemplate": {
 					"type": "string",
-					"default":"// ${var_name} "
+					"default": "// ${var_name} "
 				}
 			}
 		}
@@ -64,5 +66,8 @@
 		"mocha": "^8.4.0",
 		"typescript": "^4.3.2",
 		"vscode-test": "^1.5.2"
+	},
+	"dependencies": {
+		"moment": "^2.29.1"
 	}
 }

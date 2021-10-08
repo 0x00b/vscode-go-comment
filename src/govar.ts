@@ -9,7 +9,7 @@ export type GoVar = {
 };
 
 // match "type XXX ..."
-const varRegexPattern = RegExp("^\\s*(?:var)?\\s*(\\w+)(?:\\s+(\\w+))?\\s*");
+const varRegexPattern = RegExp("^\\s*(?:var)?(?:const)?\\s*(\\w+)(?:\\s+(\\w+))?\\s*");
 
 export function detect(ctx: Ctx): DetectResult | null {
     let f = {} as GoVar;

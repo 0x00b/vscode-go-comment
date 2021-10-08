@@ -302,9 +302,17 @@ export const GIT_NAME = "${git_name}";
 
 export const UPDATE = "@update";
 
+export const LINE_DATE = "@date";
+export const LINE_AUTHOR = "@author";
+
 
 export const LINETYPE = 0;
 export const LINEUPDATE = 1;
+export const LINEDATE = 2;
+export const LINEAUTHOR = 3;
+const LINERECEIVER = 4;
+const LINEPARAM = 5;
+const LINERETURN = 6;
 
 type Template = {
     lines: LineTemplate[]
@@ -481,11 +489,13 @@ const RECEIVER = "@receiver";
 const PARAM = "@param";
 const RETURN = "@return";
 
-const LINERECEIVER = 2;
-const LINEPARAM = 3;
-const LINERETURN = 4;
-
 function lineType(line: string): number {
+    if (line.includes(LINE_AUTHOR)) {
+        return LINEAUTHOR;
+    }
+    if (line.includes(LINE_DATE)) {
+        return LINEDATE;
+    }
     if (line.includes(RECEIVER)) {
         return LINERECEIVER;
     }
