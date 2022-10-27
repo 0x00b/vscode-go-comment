@@ -62,3 +62,10 @@ func (r receiver)Foo(i interface{}) (e error)
 * ${var_type} : var n int, ${var_type} is "int"
 * ${date} : date
 * ${git_name}: git config name
+
+### how to build and publish
+```shell
+vsce login publisher #login first, if need
+vsce package
+vsce publish
+```
