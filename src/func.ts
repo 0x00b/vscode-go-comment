@@ -18,7 +18,7 @@ export function parseString(code: string): Variable | null {
         return null;
     }
     let variable = {} as Variable;
-    let res = RegExp("^(?:\\s*(\\w*)\\s+)?(.*)\\s*").exec(code);
+    let res = RegExp(/^(?:\s*(\w*)\s+)?(.*)\s*/).exec(code);
     if (res !== null) {
         variable.name = res[1];
         variable.type = res[2];
@@ -27,10 +27,26 @@ export function parseString(code: string): Variable | null {
 
     return null;
 }
+export function parseGeneric(code: string): Variable[] | null {
+    if (!code || code === undefined || code.trim() === "") {
+        return null;
+    }
+    let typeStrs = code.split(",");
+    let res = [] as Variable[];
+    for (const i in typeStrs) {
+        let t = parseString(typeStrs[i]);
+        if (t !== null) {
+            res.push(t);
+        }
+    }
+    return res;
+}
 
 export type GoFunc = {
     //函数名
     name: string,
+    //函数接收器
+    generics: Variable[] | null,
     //函数接收器
     receiver: Variable | null,
     //参数
@@ -73,17 +89,18 @@ function autoCompleteList(list: Variable[] | null): Variable[] | null {
 function parse(code: string) {
 
     let f = {} as GoFunc;
-    //func (r receiver) Foo (
-    let res = RegExp("^\\s*(?:func(?:\\s+|\\s+\\(([\\w\\s\\*]+)\\)\\s+))?(\\w+)\\s*\\(").exec(code);
+    //func (r receiver) Foo [T] (
+    let res = RegExp(/^\s*(?:func(?:\s+|\s+\(([\w\s\*]+)\)\s+))?(\w+)\s*(?:\[([\w\*\|\s,]*)\])*\s*\(/).exec(code);
     if (res !== null) {
         f.receiver = parseString(res[1]);
         f.name = res[2];
+        f.generics = parseGeneric(res[3]);
         //parse parameters and return parameters
         return parseInParams(f, code, res[0].length);
 
     } else {
         //type Foo func(
-        let res = RegExp("^\\s*type\\s*(\\w+)\\s*func\\s*\\(").exec(code);
+        let res = RegExp(/^\s*type\s*(\w+)\s*func\s*\(/).exec(code);
         if (res !== null) {
 
             f.name = res[1];
@@ -115,7 +132,7 @@ function parseParams(list: Variable[], code: string, start: number): ParseParams
 
     for (let i = 0; i < params.length; i++) {
         let p = params[i];
-        if (p && p !== undefined && RegExp(".*func\\s*\\(").test(p)) {
+        if (p && p !== undefined && RegExp(/.*func\s*\(/).test(p)) {
             //find end ')
             let paramEnd = findBracketEnd(code, start, true);
             if (-1 === paramEnd) {
