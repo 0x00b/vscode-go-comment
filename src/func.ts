@@ -429,7 +429,7 @@ function escapeSpecialRegexChars(str: string): string {
     return str.replace(/[\{\}\(\)\\\[\]\.\+\*\?\^\$\|]/g, '\\$&');
 }
 
-export function originContent(ctx: generate.Ctx, originAnnotation: string[] | null, line: string) {
+export function originContent(ctx: generate.Ctx, originAnnotation: string[] | null, line: string, firstLine: boolean) {
     if (originAnnotation === null || originAnnotation === undefined) {
         return "";
     }
@@ -437,7 +437,6 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
     line = escapeSpecialRegexChars(line);
 
     let reg = line.replace(/\s+/g, "\\s*") + "\\s+(.+)";
-
     for (const i in originAnnotation) {
         let s = originAnnotation[i];
         let matcher = RegExp(reg).exec(s);
@@ -446,10 +445,15 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
             if (RegExp("^\\s*$").test(t)) {
                 return "";
             }
-            return s.substring(s.indexOf(t));
+            return s.substring(s.lastIndexOf(t));
         }
     }
-
+    if (firstLine && originAnnotation.length > 0) {
+        let anno = RegExp(/^(\s*[\/|\*]*\s*).*/g).exec(originAnnotation[0]);
+        if (anno && anno.length > 1) {
+            return originAnnotation[0].substring(anno[1].length);
+        }
+    }
     return "";
 }
 
@@ -458,9 +462,9 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
 
 // default template code
 const DEFAULTFUNCTEMPLATE = "// ${func_name} \n" +
-    "//  @receiver ${receiver_name} \n" +
-    "//  @param ${param_name} \n" +
-    "//  @return ${return_name} \n";
+    "// @receiver ${receiver_name} \n" +
+    "// @param ${param_name} \n" +
+    "// @return ${return_name} \n";
 
 // current method name
 const FUNCTION_NAME = "${func_name}";
@@ -638,7 +642,7 @@ function formatLine(ctx: generate.Ctx, firstLine: boolean, func: GoFunc, lineTem
         }
 
     } else {
-        content = originContent(ctx, originAnnotation, line);
+        content = originContent(ctx, originAnnotation, line, firstLine);
     }
 
     //      content.split("\n");

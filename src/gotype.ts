@@ -130,7 +130,7 @@ function formatLine(ctx: Ctx, firstLine: boolean, type: GoType, lineTemplate: Li
         }
 
     } else {
-        content = originContent(ctx, originAnnotation, line);
+        content = originContent(ctx, originAnnotation, line, firstLine);
     }
 
     //      content.split("\n");
