@@ -33,7 +33,7 @@
 			"properties": {
 				"functionTemplate": {
 					"type": "string",
-					"default": "// ${func_name} \n// @receiver ${receiver_name} \n// @param ${param_name} \n// @return ${return_name} "
+					"default": "// ${func_name} \n//  @receiver ${receiver_name} \n//  @param ${param_name} \n//  @return ${return_name} "
 				},
 				"typeTemplate": {
 					"type": "string",

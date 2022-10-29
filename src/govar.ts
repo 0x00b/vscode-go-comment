@@ -1,4 +1,4 @@
-import { DetectResult, DATE, GIT_NAME, LINEUPDATE, LINETYPE, UPDATE, parseOriginAnnotation, parseTemplate, LineTemplate, originContent } from "./func";
+import { DetectResult, DATE, GIT_NAME, LINEUPDATE, LINEUNKOWN, UPDATE, parseOriginAnnotation, parseTemplate, LineTemplate, originContent } from "./func";
 import { Ctx } from "./generate";
 import * as vscode from 'vscode';
 
@@ -55,7 +55,7 @@ const KEYS = [
 //     if (line.includes(UPDATE)) {
 //         return LINEUPDATE;
 //     }
-//     return LINETYPE;
+//     return LINEUNKOWN;
 // }
 
 export function generateComment(ctx: Ctx, result: DetectResult): string | null {
@@ -85,7 +85,7 @@ export function generateComment(ctx: Ctx, result: DetectResult): string | null {
         let lineTemplate = template.lines[i];
         let line = lineTemplate.lineTemplate;
         switch (lineTemplate.type) {
-            case LINETYPE:
+            case LINEUNKOWN:
             case LINEUPDATE:
             default:
                 line = replaceKey(ctx, type, lineTemplate);

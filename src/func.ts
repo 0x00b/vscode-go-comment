@@ -323,13 +323,15 @@ export const LINE_DATE = "@date";
 export const LINE_AUTHOR = "@author";
 
 
-export const LINETYPE = 0;
+export const LINEUNKOWN = 0;
 export const LINEUPDATE = 1;
 export const LINEDATE = 2;
 export const LINEAUTHOR = 3;
 const LINERECEIVER = 4;
 const LINEPARAM = 5;
 const LINERETURN = 6;
+const LINEFUNC = 7;
+const LINEGENERIC = 8;
 
 type Template = {
     lines: LineTemplate[]
@@ -376,7 +378,7 @@ export function parseTemplate(ctx: generate.Ctx, keys: string[], tempStr: string
             lines[i] += " ";
         }
         kt.lineTemplate = lines[i];
-        kt.type = lineType(kt.lineTemplate);
+        kt.type = templateLineType(kt.lineTemplate);
 
         for (let j = 0; j < keys.length; j++) {
             if (lines[i].includes(keys[j])) {
@@ -412,7 +414,7 @@ export function parseOriginAnnotation(ctx: generate.Ctx): string[] | null {
         }
 
         let type = lineType(lines[i]);
-        if (type === LINETYPE) {
+        if (type === LINEUNKOWN) {
             annotations[current] = annotations[current] + "\n" + lines[i];
             continue;
         }
@@ -462,9 +464,9 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
 
 // default template code
 const DEFAULTFUNCTEMPLATE = "// ${func_name} \n" +
-    "// @receiver ${receiver_name} \n" +
-    "// @param ${param_name} \n" +
-    "// @return ${return_name} \n";
+"//  @receiver ${receiver_name} \n" +
+"//  @param ${param_name} \n" +
+"//  @return ${return_name} \n";
 
 // current method name
 const FUNCTION_NAME = "${func_name}";
@@ -529,7 +531,18 @@ function lineType(line: string): number {
     if (line.includes(UPDATE)) {
         return LINEUPDATE;
     }
-    return LINETYPE;
+    return LINEUNKOWN;
+}
+
+function templateLineType(line: string): number {
+    let t = lineType(line);
+    if (t !== LINEUNKOWN) {
+        return t;
+    }
+    if (line.includes(FUNCTION_NAME)) {
+        return LINEFUNC;
+    }
+    return LINEUNKOWN;
 }
 
 // 记住一个原则，go的参数type一定会有，name不一定有
@@ -565,6 +578,8 @@ export function generateComment(ctx: generate.Ctx, result: DetectResult): string
         let lineTemplate = template.lines[i];
         let line = lineTemplate.lineTemplate;
         switch (lineTemplate.type) {
+            case LINEUNKOWN:
+                break;
             case LINEPARAM:
                 if (!func.parameters) {
                     break;
@@ -588,8 +603,8 @@ export function generateComment(ctx: generate.Ctx, result: DetectResult): string
                 if (!func.receiver) {
                     break;
                 }
-            case LINETYPE:
             case LINEUPDATE:
+            case LINEFUNC:
             default:
                 line = replaceKey(ctx, func, lineTemplate);
                 annotation = formatLine(ctx, i === 0, func, lineTemplate, originAnnotation, annotation, linePrefix, line) + "\n";
@@ -628,8 +643,10 @@ export function generateComment(ctx: generate.Ctx, result: DetectResult): string
 function formatLine(ctx: generate.Ctx, firstLine: boolean, func: GoFunc, lineTemplate: LineTemplate, originAnnotation: string[] | null, annotation: string, linePrefix: string, line: string): string {
 
     let content = "";
-    if (firstLine && originAnnotation !== null && originAnnotation.length === 1 &&
-        RegExp("^\\s*(?://|/\\*)\\s*\\$\\{func_name\\}").test(lineTemplate.lineTemplate)) {
+    if (firstLine 
+        && originAnnotation !== null 
+        && originAnnotation.length === 1 
+        && lineTemplate.type === LINEFUNC) {
         let origin = originAnnotation[0];
         if (RegExp("^\\s*(?://|/\\*)\\s*" + func.name).test(origin)) {
             let m = RegExp("^\\s*(?://|/\\*)\\s*" + func.name + "\\s*(.*)").exec(origin);
