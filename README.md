@@ -10,9 +10,9 @@
 + **control + command + / (For windows: control + alt + /)**
    
 ## config template
-+ 1. shift+command+p -> open setting (json)
-+ 2. add line "functionTemplate": "// ${func_name} \n//  @receiver ${receiver_name} \n//  @param ${param_name} \n//  @return ${return_name} ",
-+ 3. add line "typeTemplate": "// ${type_name} " 
++ 1. shift+command+p -> open setting (`json`)
++ 2. add line `"functionTemplate": "// ${func_name} \n//  @receiver ${receiver_name} \n//  @param ${param_name} \n//  @return ${return_name} "`,
++ 3. add line `"typeTemplate": "// ${type_name} "` 
 
 <br/>
 推荐使用默认注释，满足Golang godoc注释规范，满足golint默认扫描规则。<br/>
