@@ -42,11 +42,12 @@ godoc -http=localhost:6060
 * @return ： golang function return parameter
 * @author ： author name, or use ${git_name}
 * @date ： use ${date}, if not set, use current date
-* @update ： update tag, maybe config as "${git_name} ${date}", update "${date}" always
+* @update ： update tag, maybe config as `"${git_name} ${date}"`, update `"${date}"` always
 
 ### support variable
 ```go
 func (r receiver)Foo(i interface{}) (e error)
+```
 ```
 * ${func_name} : function name is "Foo".
 * ${receiver_name} : will be replaced by "r".
@@ -64,6 +65,7 @@ func (r receiver)Foo(i interface{}) (e error)
 * ${var_type} : var n int, ${var_type} is "int"
 * ${date} : date
 * ${git_name}: git config name
+```
 
 ### how to build and publish
 ```shell
