@@ -40,7 +40,9 @@ godoc -http=localhost:6060
 * @receiver ： golang function receiver
 * @param ： golang function parameter 
 * @return ： golang function return parameter
-* @update ： update tag, when update annotation, will add one line
+* @author ： author name, or use ${git_name}
+* @date ： use ${date}, if not set, use current date
+* @update ： update tag, maybe config as "${git_name} ${date}", update "${date}" always
 
 ### support variable
 ```go

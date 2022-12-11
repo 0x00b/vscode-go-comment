@@ -598,7 +598,15 @@ export function generateComment(ctx: generate.Ctx, result: DetectResult): string
                     annotation = formatLine(ctx, i === 0, func, lineTemplate, originAnnotation, annotation, linePrefix, line) + "\n";
                 }
                 break;
-
+            case LINEDATE:
+                let templine = getDateOriginAnotation(ctx, originAnnotation, line, i === 0);
+                if (templine === "") {
+                    line = replaceKey(ctx, func, lineTemplate);
+                    annotation = formatLine(ctx, i === 0, func, lineTemplate, originAnnotation, annotation, linePrefix, line) + "\n";
+                } else {
+                    annotation += templine+'\n';
+                }
+                break;
             case LINERECEIVER:
                 if (!func.receiver) {
                     break;
@@ -638,6 +646,20 @@ export function generateComment(ctx: generate.Ctx, result: DetectResult): string
         }
     }
     return annotation;
+}
+function getDateOriginAnotation(ctx: generate.Ctx, originAnnotation: string[] | null, line: string, firstLine: boolean):string {
+    if (!originAnnotation)
+    {
+        return "";
+    }
+    let content = "";
+     for (const i in originAnnotation) { 
+        if (originAnnotation[i].indexOf(LINE_DATE) > 0) {
+            content = originAnnotation[i];
+            break;
+        }
+    }
+    return content;
 }
 
 function formatLine(ctx: generate.Ctx, firstLine: boolean, func: GoFunc, lineTemplate: LineTemplate, originAnnotation: string[] | null, annotation: string, linePrefix: string, line: string): string {
