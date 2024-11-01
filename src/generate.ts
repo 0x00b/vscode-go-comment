@@ -74,6 +74,7 @@ function replaceAnnotation(ctx: Ctx, result: func.DetectResult, annotation: stri
         // let end = fc.getLineEndOffset(lines, ctx.code.annotation.endLine);
         // replaceString(start, end, annotation);
         
+        // 兼容windows的换行，给他干掉
         annotation = annotation.replace(/\r$/, '');
 
         ctx.editor.edit(editBuilder => {
