@@ -22,7 +22,7 @@ export function generate(ctx: Ctx) {
         return;
     }
   
-    ctx.date = moment(new Date()).format("YYYY-MM-DD hh:mm:ss");
+    ctx.date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
   
     var exec = require('child_process').execSync;
     ctx.gitName = exec('git config user.name').toString().trim();
@@ -73,6 +73,9 @@ function replaceAnnotation(ctx: Ctx, result: func.DetectResult, annotation: stri
         // let start = fc.getLineStartOffset(lines, ctx.code.annotation.startLine);
         // let end = fc.getLineEndOffset(lines, ctx.code.annotation.endLine);
         // replaceString(start, end, annotation);
+        
+        annotation = annotation.replace(/\r$/, '');
+
         ctx.editor.edit(editBuilder => {
             editBuilder.replace(new vscode.Range(
                 new vscode.Position(ctx.code.annotation.startLine, 0),
