@@ -24,8 +24,11 @@ export function generate(ctx: Ctx) {
   
     ctx.date = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
   
-    var exec = require('child_process').execSync;
-    ctx.gitName = exec('git config user.name').toString().trim();
+    try {
+        var exec = require('child_process').execSync;
+        ctx.gitName = exec('git config user.name').toString().trim();
+    } catch (error) {
+    }
 
     let res = func.detect(ctx);
     if (res !== null) {
