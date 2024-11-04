@@ -42,7 +42,7 @@ godoc -http=localhost:6060
     "functionTemplate": "// ${func_name} \n//  @receiver ${receiver_name} \n//  @param ${param_name} \n//  @return ${return_name} \n//  @author ${git_name} \n//  @date ${date}",
 }
 ```
-原因是第一行的注释是 "// ", 后面是一个空格，后面的行的注释开头是"//  "，后面是两个空格，gofmt认为第一行的注释和后面的注释风格不一样，会被gofmt主动加上tab键，导致最终格式变化。
+原因是第一行的注释是 "// ", 后面是一个空格，后面的行的注释开头//后面是两个空格，gofmt认为第一行的注释和后面的注释风格不一样，会被gofmt主动加上tab键，导致最终格式变化。
 
 ## How to install
 1.vscode plugins marketplace(search GoComment)
