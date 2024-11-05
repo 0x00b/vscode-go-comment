@@ -306,10 +306,23 @@ export function detect(ctx: generate.Ctx): DetectResult | null {
     return res;
 }
 
-export type LineTemplate = {
+export class LineTemplate {
     keys: string[];
     lineTemplate: string;
     type: number;
+
+    constructor(keys: string[],
+    lineTemplate: string,
+    type: number) {
+        this.keys = keys;
+        this.lineTemplate = lineTemplate;
+        this.type = type;
+    }
+    // 拷贝构造函数
+    static from(lt: LineTemplate): LineTemplate {
+        return new LineTemplate(lt.keys, lt.lineTemplate,lt.type);
+    }
+
 };
 
 
@@ -600,11 +613,19 @@ export function generateComment(ctx: generate.Ctx, result: DetectResult): string
                 break;
             case LINEDATE:
                 let templine = getDateOriginAnotation(ctx, originAnnotation, line, i === 0);
-                if (templine === "") {
+
+                const datePattern = /(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})/;
+                const match = templine.match(datePattern);
+                if (match) {
+                    const date = match[1]; // 提取日期部分
+                    const newLineTpl = LineTemplate.from(lineTemplate);
+                    // 先把时间替换了，replaceKey就不会更新时间了
+                    newLineTpl.lineTemplate = newLineTpl.lineTemplate.replace(DATE, date);
+                    templine = replaceKey(ctx, func, newLineTpl);
+                    annotation += templine+'\n';
+                } else {
                     line = replaceKey(ctx, func, lineTemplate);
                     annotation = formatLine(ctx, i === 0, func, lineTemplate, originAnnotation, annotation, linePrefix, line) + "\n";
-                } else {
-                    annotation += templine+'\n';
                 }
                 break;
             case LINERECEIVER:
