@@ -1,6 +1,7 @@
 
 import * as generate from "./generate";
 import * as vscode from 'vscode';
+import * as tool from "./tool"
 
 export function generateFunc(ctx: generate.Ctx) {
 
@@ -444,6 +445,70 @@ function escapeSpecialRegexChars(str: string): string {
     return str.replace(/[\{\}\(\)\\\[\]\.\+\*\?\^\$\|]/g, '\\$&');
 }
 
+function joinWithSpaces(arr: string[]): string {
+    if (arr.length === 0) {
+        return "";
+    }
+
+    const result: string[] = [];
+
+    for (let i = 0; i < arr.length; i++) {
+        // 添加当前元素
+        result.push(arr[i]);
+
+        // 检查是否是最后一个元素
+        if (i < arr.length - 1) {
+            // 检查当前元素和下一个元素是否都是 \w+
+            const currentIsWord = '\\w+' == arr[i];
+            const nextIsWord = '\\w+' == arr[i + 1];
+
+            if (currentIsWord && nextIsWord) {
+                result.push('\\s+');
+            } else {
+                result.push('\\s*');
+            }
+        }
+    }
+
+    return result.join('');
+}
+
+function extractWords(pattern: string, input: string): [string[], number] {
+    // 解析模式，生成正则表达式
+    let regexPatternArr = pattern.trim()
+        .split(' ') // 按空格分割
+        // /^\w+/ 过滤掉固定的 @return 等等
+        .map(part => RegExp(/^\w+/).test(part) ? '\\w+' : part) // 空格位置用 \\s+ 匹配，其他位置用 (\\S+) 匹配
+
+     let regexPattern =  joinWithSpaces(regexPatternArr); // 重新组合成正则表达式
+
+    // 创建正则表达式
+	regexPattern = "("+regexPattern+")"
+    const regex = new RegExp(regexPattern);
+
+    // 执行匹配
+    const match = input.match(regex);
+
+    console.log(`regexPattern ${regexPattern}`);
+    console.log(`line ${pattern} s:${input} oldTpl ${match} `);
+
+    // 如果匹配成功，返回对应位置的单词
+    if (match) {
+        return [match.slice(1), regexPatternArr.length]; // 返回匹配的单词，去掉第一个元素（整个匹配）
+    }
+
+    return [[],0]; // 如果没有匹配，返回空数组
+
+    // 示例用法
+    // const pattern = '// a bdd cddd ';
+    // const input = '// hello world example';
+    
+    // const result = extractWords(pattern, input);
+    // console.log(result); // 输出: ['world', 'example']
+}
+
+
+
 export function originContent(ctx: generate.Ctx, originAnnotation: string[] | null, line: string, firstLine: boolean) {
     if (originAnnotation === null || originAnnotation === undefined) {
         return "";
@@ -451,16 +516,51 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
 
     line = escapeSpecialRegexChars(line);
 
-    let reg = line.replace(/\s+/g, "\\s*") + "\\s+(.+)";
+    const originReg = line.replace(/\s+/g, "\\s*")
+
+    // let reg = originReg + "\\s+(.+)";
+    let reg = originReg + "\\s+";
+    
     for (const i in originAnnotation) {
-        let s = originAnnotation[i];
-        let matcher = RegExp(reg).exec(s);
-        if (matcher !== null) {
-            let t = matcher[1];
-            if (RegExp("^\\s*$").test(t)) {
-                return "";
+        let s = originAnnotation[i].trimLeft();
+
+        // 如果是第一行，检查是不是有函数名等拼写错误，先纠错
+        // if(firstLine && i == '0'){
+        //     let oldFirstWord = tool.getFirstWord(s)
+        //     if (oldFirstWord!=="" && tool.isAutoSpellingError(firstWord, oldFirstWord)){
+        //         s = s.replace(oldFirstWord, firstWord)
+        //     }
+        // }
+        // 非第一行也要检查拼写错误，或者改名
+        const oldTpl = extractWords(line, s)
+
+        if (oldTpl.length >= 2 && oldTpl[0].length > 0 && oldTpl[1] > 0) {
+            
+            // 单词数
+            let threshold = oldTpl[1]
+            threshold = line.length / threshold / 2
+
+            if (oldTpl[0][0] !== "" && tool.isSpellingError(line.toLowerCase(), oldTpl[0][0].toLowerCase(), threshold)){
+                s = s.replace(oldTpl[0][0], line)
             }
-            return s.substring(s.lastIndexOf(t));
+        }
+
+        // if (firstLine){
+            // 主动加一个空格，兼容 "// funcname"
+            const regex = /(?<=\S)(?=\r?\n)/g; // 匹配换行符前的位置
+            s = s.replace(RegExp(regex), ' '); // 在匹配的位置插入空格
+        // }
+
+        // 必须要有空格
+        // funcname xxxx
+        let match = RegExp(reg).test(s);
+        if (match) {
+            let replaceReg = originReg
+            if (replaceReg.endsWith("\\s*")) {
+                // 要保留换行
+                replaceReg = replaceReg.replace(/\\s\*$/, '[ \\t]*');
+            }
+            return s.replace(RegExp(replaceReg), "");
         }
     }
     if (firstLine && originAnnotation.length > 0) {
@@ -477,9 +577,9 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
 
 // default template code
 const DEFAULTFUNCTEMPLATE = "// ${func_name} \n" +
-"// @receiver ${receiver_name} \n" +
-"// @param ${param_name} \n" +
-"// @return ${return_name} \n";
+"//  @receiver ${receiver_name} \n" +
+"//  @param ${param_name} \n" +
+"//  @return ${return_name} \n";
 
 // current method name
 const FUNCTION_NAME = "${func_name}";
@@ -686,24 +786,24 @@ function getDateOriginAnotation(ctx: generate.Ctx, originAnnotation: string[] | 
 function formatLine(ctx: generate.Ctx, firstLine: boolean, func: GoFunc, lineTemplate: LineTemplate, originAnnotation: string[] | null, annotation: string, linePrefix: string, line: string): string {
 
     let content = "";
-    if (firstLine 
-        && originAnnotation !== null 
-        && originAnnotation.length === 1 
-        && lineTemplate.type === LINEFUNC) {
-        let origin = originAnnotation[0];
-        if (RegExp("^\\s*(?://|/\\*)\\s*" + func.name).test(origin)) {
-            let m = RegExp("^\\s*(?://|/\\*)\\s*" + func.name + "\\s*(.*)").exec(origin);
-            if (m && !RegExp("^\\s*$").test(m[1])) {
-                content = origin.substring(origin.indexOf(m[1]));
-            }
-        } else {
-            //满足go规范的注释模版，如果原来的不满足，则直接用原来的注释补充第一行
-            content = origin.trim().substring(2).trim();
-        }
+    // if (firstLine 
+    //     && originAnnotation !== null 
+    //     && originAnnotation.length === 1 
+    //     && lineTemplate.type === LINEFUNC) {
+    //     let origin = originAnnotation[0];
+    //     if (RegExp("^\\s*(?://|/\\*)\\s*" + func.name).test(origin)) {
+    //         let m = RegExp("^\\s*(?://|/\\*)\\s*" + func.name + "\\s*(.*)").exec(origin);
+    //         if (m && !RegExp("^\\s*$").test(m[1])) {
+    //             content = origin.substring(origin.indexOf(m[1]));
+    //         }
+    //     } else {
+    //         //满足go规范的注释模版，如果原来的不满足，则直接用原来的注释补充第一行
+    //         content = origin.trim().substring(2).trim();
+    //     }
 
-    } else {
+    // } else {
         content = originContent(ctx, originAnnotation, line, firstLine);
-    }
+    // }
 
     //      content.split("\n");
 

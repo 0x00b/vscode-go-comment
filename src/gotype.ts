@@ -116,22 +116,22 @@ export function generateComment(ctx: Ctx, result: DetectResult): string | null {
 function formatLine(ctx: Ctx, firstLine: boolean, type: GoType, lineTemplate: LineTemplate, originAnnotation: string[] | null, annotation: string, linePrefix: string, line: string): string {
 
     let content = "";
-    if (firstLine && originAnnotation !== null && originAnnotation.length === 1 &&
-        RegExp("^\\s*(?://|/\\*)\\s*\\$\\{type_name\\}").test(lineTemplate.lineTemplate)) {
-        let origin = originAnnotation[0];
-        if (RegExp("^\\s*(?://|/\\*)\\s*" + type.name).test(origin)) {
-            let m = RegExp("^\\s*(?://|/\\*)\\s*" + type.name + "\\s*(.*)").exec(origin);
-            if (m && !RegExp("^\\s*$").test(m[1])) {
-                content = origin.substring(origin.indexOf(m[1]));
-            }
-        } else {
-            //满足go规范的注释模版，如果原来的不满足，则直接用原来的注释补充第一行
-            content = origin.trim().substring(2).trim();
-        }
+    // if (firstLine && originAnnotation !== null && originAnnotation.length === 1 &&
+    //     RegExp("^\\s*(?://|/\\*)\\s*\\$\\{type_name\\}").test(lineTemplate.lineTemplate)) {
+    //     let origin = originAnnotation[0];
+    //     if (RegExp("^\\s*(?://|/\\*)\\s*" + type.name).test(origin)) {
+    //         let m = RegExp("^\\s*(?://|/\\*)\\s*" + type.name + "\\s*(.*)").exec(origin);
+    //         if (m && !RegExp("^\\s*$").test(m[1])) {
+    //             content = origin.substring(origin.indexOf(m[1]));
+    //         }
+    //     } else {
+    //         //满足go规范的注释模版，如果原来的不满足，则直接用原来的注释补充第一行
+    //         content = origin.trim().substring(2).trim();
+    //     }
 
-    } else {
+    // } else {
         content = originContent(ctx, originAnnotation, line, firstLine);
-    }
+    // }
 
     //      content.split("\n");
 
