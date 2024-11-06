@@ -521,6 +521,8 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
     // let reg = originReg + "\\s+(.+)";
     let reg = originReg + "\\s+";
     
+    let allTpl:[string,string, number][] = [];
+    
     for (const i in originAnnotation) {
         let s = originAnnotation[i].trimLeft();
 
@@ -534,35 +536,55 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
         // 非第一行也要检查拼写错误，或者改名
         const oldTpl = extractWords(line, s)
 
+        // 找到所有的 oldTpl 让后使用编辑距离最小的那个
+
         if (oldTpl.length >= 2 && oldTpl[0].length > 0 && oldTpl[1] > 0) {
-            
-            // 单词数
-            let threshold = oldTpl[1]
-            threshold = line.length / threshold / 2
-
-            if (oldTpl[0][0] !== "" && tool.isSpellingError(line.toLowerCase(), oldTpl[0][0].toLowerCase(), threshold)){
-                s = s.replace(oldTpl[0][0], line)
-            }
+            allTpl.push([s, oldTpl[0][0], oldTpl[1]])
         }
+    }
 
+    let minDistanceStr = ""
+    let minDistance = Number.MAX_SAFE_INTEGER
+
+    allTpl.forEach(oldTpl => {
+            // 单词数
+            let threshold = oldTpl[2]
+            threshold = Math.round( line.length / threshold / 2)
+
+            let s = oldTpl[0]
+
+            if (oldTpl[1] === ""){
+                return
+            }
+
+            let distance = tool.levenshteinDistance(line.toLowerCase(), oldTpl[1].toLowerCase())
+            
+            if (distance < minDistance && distance <= threshold){
+                minDistance = distance
+                minDistanceStr = s.replace(oldTpl[1], line)
+            } 
+        });
+
+    if (minDistanceStr !== "") {
         // if (firstLine){
             // 主动加一个空格，兼容 "// funcname"
             const regex = /(?<=\S)(?=\r?\n)/g; // 匹配换行符前的位置
-            s = s.replace(RegExp(regex), ' '); // 在匹配的位置插入空格
+            minDistanceStr = minDistanceStr.replace(RegExp(regex), ' '); // 在匹配的位置插入空格
         // }
 
         // 必须要有空格
         // funcname xxxx
-        let match = RegExp(reg).test(s);
+        let match = RegExp(reg).test(minDistanceStr);
         if (match) {
             let replaceReg = originReg
             if (replaceReg.endsWith("\\s*")) {
                 // 要保留换行
                 replaceReg = replaceReg.replace(/\\s\*$/, '[ \\t]*');
             }
-            return s.replace(RegExp(replaceReg), "");
+            return minDistanceStr.replace(RegExp(replaceReg), "");
         }
     }
+
     if (firstLine && originAnnotation.length > 0) {
         let anno = RegExp(/^(\s*[\/|\*]*\s*).*/g).exec(originAnnotation[0]);
         if (anno && anno.length > 1) {
@@ -722,7 +744,7 @@ export function generateComment(ctx: generate.Ctx, result: DetectResult): string
                     // 先把时间替换了，replaceKey就不会更新时间了
                     newLineTpl.lineTemplate = newLineTpl.lineTemplate.replace(DATE, date);
                     templine = replaceKey(ctx, func, newLineTpl);
-                    annotation += templine+'\n';
+                    annotation += linePrefix + templine+'\n';
                 } else {
                     line = replaceKey(ctx, func, lineTemplate);
                     annotation = formatLine(ctx, i === 0, func, lineTemplate, originAnnotation, annotation, linePrefix, line) + "\n";

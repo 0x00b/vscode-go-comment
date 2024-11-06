@@ -1,5 +1,5 @@
 
-function levenshteinDistance(a: string, b: string): number {
+export function levenshteinDistance(a: string, b: string): number {
     const matrix: number[][] = [];
 
     // Initialize the matrix
