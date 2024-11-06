@@ -475,7 +475,7 @@ function joinWithSpaces(arr: string[]): string {
 
 function extractWords(pattern: string, input: string): [string[], number] {
     // 解析模式，生成正则表达式
-    let regexPatternArr = pattern.trim()
+    let regexPatternArr = removeMoreSpace(pattern.trim())
         .split(' ') // 按空格分割
         // /^\w+/ 过滤掉固定的 @return 等等
         .map(part => RegExp(/^\w+/).test(part) ? '\\w+' : part) // 空格位置用 \\s+ 匹配，其他位置用 (\\S+) 匹配
@@ -507,7 +507,17 @@ function extractWords(pattern: string, input: string): [string[], number] {
     // console.log(result); // 输出: ['world', 'example']
 }
 
+function removeMoreSpace(str: string):string{
 
+    // // 解析模式，生成正则表达式
+    // let strArr = str.trim()
+    //     .split(' ') // 按空格分割
+
+    // str = strArr.map(part => RegExp(/^\s+/).test(part) ? '' : part)
+    //     .join(" ")
+
+    return str.replace(/\s+/g, ' ');
+}
 
 export function originContent(ctx: generate.Ctx, originAnnotation: string[] | null, line: string, firstLine: boolean) {
     if (originAnnotation === null || originAnnotation === undefined) {
@@ -557,7 +567,7 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
                 return
             }
 
-            let distance = tool.levenshteinDistance(line.toLowerCase(), oldTpl[1].toLowerCase())
+            let distance = tool.levenshteinDistance(removeMoreSpace(line.toLowerCase()), removeMoreSpace(oldTpl[1].toLowerCase()))
             
             if (distance < minDistance && distance <= threshold){
                 minDistance = distance
@@ -566,6 +576,8 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
         });
 
     if (minDistanceStr !== "") {
+
+        console.log(`minDistanceStr ${minDistanceStr}`)
         // if (firstLine){
             // 主动加一个空格，兼容 "// funcname"
             const regex = /(?<=\S)(?=\r?\n)/g; // 匹配换行符前的位置
