@@ -474,11 +474,20 @@ function joinWithSpaces(arr: string[]): string {
 }
 
 function extractWords(pattern: string, input: string): [string[], number] {
+
+    // 比较复杂的类型
+    // 
+	// FuncTest
+	//  @param context.Context
+	//  @param func(*context.Context) interface{}
+	//  @return error
+	//  @return interface{}
+
     // 解析模式，生成正则表达式
     let regexPatternArr = removeMoreSpace(pattern.trim())
         .split(' ') // 按空格分割
         // /^\w+/ 过滤掉固定的 @return 等等
-        .map(part => RegExp(/^\w+/).test(part) ? '\\w+' : part) // 空格位置用 \\s+ 匹配，其他位置用 (\\S+) 匹配
+        .map(part => RegExp(/^\w+$/).test(part) ? '\\w+' : part) // 空格位置用 \\s+ 匹配，其他位置用 (\\S+) 匹配
 
      let regexPattern =  joinWithSpaces(regexPatternArr); // 重新组合成正则表达式
 
@@ -524,9 +533,9 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
         return "";
     }
 
-    line = escapeSpecialRegexChars(line);
+    let originRegLine = escapeSpecialRegexChars(line);
 
-    const originReg = line.replace(/\s+/g, "\\s*")
+    let originReg = originRegLine.replace(/\s+/g, "\\s*")
 
     // let reg = originReg + "\\s+(.+)";
     let reg = originReg + "\\s+";
@@ -543,8 +552,13 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
         //         s = s.replace(oldFirstWord, firstWord)
         //     }
         // }
+
+        // 按照line的模式，找到s中相同模式的字符串
+        // 比如line = // a b c, s = //x y z m n, 则尝试找到 //x y z
+        // 找到之后，后面的 m n 就是手动输入的注释，需要保留
+
         // 非第一行也要检查拼写错误，或者改名
-        const oldTpl = extractWords(line, s)
+        const oldTpl = extractWords(originRegLine, s)
 
         // 找到所有的 oldTpl 让后使用编辑距离最小的那个
 
