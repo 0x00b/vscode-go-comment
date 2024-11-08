@@ -3,7 +3,7 @@
 	"displayName": "GoComment",
 	"publisher": "lijunawk",
 	"description": "GoComment is a plugin for vscode, auto generate for golang function, variable, struct comments. github: https://github.com/0x00b/vscode-go-comment",
-	"version": "0.1.9",
+	"version": "0.2.0",
 	"icon": "icon.png",
 	"repository": {
 		"url": "https://github.com/0x00b/vscode-go-comment"
@@ -61,6 +61,7 @@
 		"@types/vscode": "^1.58.0",
 		"@typescript-eslint/eslint-plugin": "^4.26.0",
 		"@typescript-eslint/parser": "^4.26.0",
+		"@vscode/vsce": "^3.2.1",
 		"eslint": "^7.27.0",
 		"glob": "^7.1.7",
 		"mocha": "^8.4.0",
@@ -68,7 +69,6 @@
 		"vscode-test": "^1.5.2"
 	},
 	"dependencies": {
-		"@vscode/vsce": "^3.2.1",
 		"moment": "^2.29.1"
 	}
 }
