@@ -625,9 +625,8 @@ export function originContent(ctx: generate.Ctx, originAnnotation: string[] | nu
 
 // default template code
 const DEFAULTFUNCTEMPLATE = "// ${func_name} \n" +
-"//  @receiver ${receiver_name} \n" +
-"//  @param ${param_name} \n" +
-"//  @return ${return_name} \n";
+"//\t@param ${param_name} \n" +
+"//\t@return ${return_name} \n";
 
 // current method name
 const FUNCTION_NAME = "${func_name}";
