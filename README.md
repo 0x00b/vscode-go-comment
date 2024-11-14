@@ -1,7 +1,7 @@
 # GoComment
 
 <!-- Plugin description -->
-**GoComment** is a plugin for vscode, auto generate for golang function, variable, struct comments. It can auto fix function name etc.
+**GoComment** is a VSCode extension that automatically generates comments for GO functions, variables, structs. It can auto fix function name etc.
 使用默认模版可以生成满足golint要求的注释，可以根据函数名的相似度来纠正拼写错误或者修改的函数名，变量名，参数名等。需要注意的是当参数名之间很相似的时候，可能会获取到错误的注释。
 可在vscode扩展插件中搜索 GoComment。
 本仓库(https://github.com/0x00b/vscode-go-comment
