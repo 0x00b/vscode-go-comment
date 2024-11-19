@@ -2,8 +2,8 @@
 	"name": "vscodeGoComment",
 	"displayName": "GoComment",
 	"publisher": "lijunawk",
-	"description": "GoComment can automatically generate comments for GO functions, variables and structs. github: https://github.com/0x00b/vscode-go-comment",
-	"version": "0.2.2",
+	"description": "GoComment can generate comments for GO functions, variables and structs. github: https://github.com/0x00b/vscode-go-comment",
+	"version": "0.2.3",
 	"icon": "icon.png",
 	"repository": {
 		"url": "https://github.com/0x00b/vscode-go-comment"
